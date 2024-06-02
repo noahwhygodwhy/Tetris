@@ -1,4 +1,6 @@
-﻿#include <iostream>
+﻿#define WIN32_LEAN_AND_MEAN
+
+#include <iostream>
 #include <stdio.h>
 #include <string>
 
@@ -18,36 +20,7 @@
 #include <unordered_map>
 
 using namespace std::chrono;
-
 using namespace std;
-
-string spaces(uint32_t numSpaces)
-{
-    return string(numSpaces, ' ');
-}
-
-uint32_t ResetWindowSize(HANDLE hStdout)
-{
-
-    //cout << "\e[8;20;50t";
-
-    short width = 30;
-    short height = 50;
-    
-    SMALL_RECT gameWindowSize = SMALL_RECT{ 0, 0, width, height };
-    COORD c = COORD{ width, height };
-
-    if (!SetConsoleScreenBufferSize(hStdout, c))
-    {
-        printf("SetConsoleScreenBufferSize failed\n");
-    }
-    if (!SetConsoleWindowInfo(hStdout, true, &gameWindowSize))
-    {
-        printf("SetConsoleWindowInfo failed\n");
-    }
-    SetConsoleTitle(L"Tetris");
-    return true;
-}
 
 static unordered_map<uint32_t, bool> keyDownMap;
 
@@ -95,7 +68,6 @@ void TryRotate(const Board& board, Piece* activePiece, int rotation)
     // fails rotation, reset piece
     activePiece->location = originalLocation;
     activePiece->rotation = srcRotation;
-
 }
 
 void HandleInput(const Board& board, Piece* activePiece)
@@ -106,9 +78,6 @@ void HandleInput(const Board& board, Piece* activePiece)
     INPUT_ENTRY('Q', TryRotate(board, activePiece, -1))
     INPUT_ENTRY('E', TryRotate(board, activePiece, 1))
 }
-
-
-
 
 void Lose(HANDLE hStdout)
 {
@@ -125,25 +94,18 @@ void Lose(HANDLE hStdout)
     exit(0);
 }
 
-
-
 HANDLE hStdout;
 int main()
 {
-
-
     if (!SetConsoleOutputCP(CP_UTF8)) {
         printf("failed to set console output mode to unicode\n");
         return -1;
     }
     _setmode(_fileno(stdout), _O_U8TEXT);
 
-
     hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 
     CONSOLE_FONT_INFOEX cfi = { sizeof(CONSOLE_FONT_INFOEX) };
-
-    // Populate cfi with the screen buffer's current font info
 
     if (!GetCurrentConsoleFontEx(hStdout, FALSE, &cfi))
     {
@@ -159,10 +121,6 @@ int main()
         wprintf(L"SetCurrentConsoleFontEx failed\n");
         exit(-1);
     }
-
-
-    //SetCurrentConsoleFontEx(hStdout, false, )
-    //GetCurrentConsoleFontEx(hStdout, false, 0);
 
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
     if (!GetConsoleScreenBufferInfo(hStdout, &csbiInfo))
@@ -202,7 +160,6 @@ int main()
             {
                 Lose(hStdout);
             }
-            //pieceBag.next(activePiece));
         }
 
 //INPUT HANDLING
@@ -220,7 +177,6 @@ int main()
             prev = now;
         }
 
-
         if (tick)
         {
             if (board.TestCollision(activePiece))
@@ -232,16 +188,11 @@ int main()
             else
             {
                 activePiece->location += Coord2D(0, 1);
-                //wprintf(L"activePieceLoc: %u, %u\n", activePiece->location.x, activePiece->location.y);
             }
             uint32_t linesEliminated = board.tick();
             uint32_t lineScore = 100u * pow(2u, linesEliminated - 1);
             score += lineScore;
         }
-        
-//DRAW STATE
-//#define DEBUG_PRINT
-#ifndef DEBUG_PRINT
 
         SetConsoleTextAttribute(hStdout, 15);
         wprintf(L"\033[%d;%dH", (0), (0));
@@ -316,10 +267,7 @@ int main()
 
         wprintf(L"\033[%d;%dH", (3), (Board::width + 4));
         wprintf(L"Score: %u\n", score);
-
-#endif // DEBUG_PRINT
         next += 200ms;
-
     }
     wprintf(L"escape pressed, exiting\n");
 }

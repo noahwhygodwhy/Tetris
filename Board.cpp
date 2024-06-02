@@ -134,35 +134,6 @@ uint32_t Board::tick()
 		return 0;
 	}
 
-
-	//for (uint32_t col = 0; col < Board::width; col++)
-	//{
-	//	if (cells[col][bottomRow] != Cell::EMPTY)
-	//	{
-	//		rowempty = false;
-	//		break;
-	//	}
-	//}
-	//if (rowempty)
-	//{
-	//	//move everything down one
-	//	for (uint32_t x = 0; x < Board::width; x++)
-	//	{
-	//		for (int32_t y = Board::height-1; y >= 0; y-- )
-	//		{
-	//			if (y == 0)
-	//			{
-	//				cells[x][y] = Cell::EMPTY;
-	//			}
-	//			else
-	//			{
-	//				cells[x][y] = cells[x][y - 1];
-	//			}
-	//		}
-	//	}
-	//	return 0; //tetris
-	//}
-
 	bool hadAFilledRow = false;
 	for (int32_t rowIndex = Board::height - 1; rowIndex >= 0; rowIndex--)
 	{
