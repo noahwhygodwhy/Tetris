@@ -172,11 +172,17 @@ int main()
     auto prev = next - 200ms;
     while (true)
     {
+        bool tick = false;
+
         auto now = steady_clock::now();
 
         if (!activePiece)
         {
             activePiece = new Piece(pieceBag.next());
+            if (board.TestOverlap(activePiece))
+            {
+                Lose();
+            }
             //pieceBag.next(activePiece));
         }
 
@@ -187,10 +193,16 @@ int main()
         }
         HandleInput(board, activePiece);
         
-
 //GAME LOGIC
 
         if (abs(prev-now) >= 200ms)
+        {
+            tick = true;
+            prev = now;
+        }
+
+
+        if (tick)
         {
             if (board.TestCollision(activePiece))
             {
@@ -203,12 +215,8 @@ int main()
                 activePiece->location += Coord2D(0, 1);
                 //wprintf(L"activePieceLoc: %u, %u\n", activePiece->location.x, activePiece->location.y);
             }
-
-            //GAME TICK HERE
-
-            prev = now;
+            uint32_t linesEliminated = board.tick();
         }
-
         
 //DRAW STATE
 //#define DEBUG_PRINT

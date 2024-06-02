@@ -115,6 +115,8 @@ enum class Cell : uint32_t
     COUNT = 8,
 };
 
+// These are ordered
+// do not change the order
 enum class PieceType : uint32_t
 {
     I,

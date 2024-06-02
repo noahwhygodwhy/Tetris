@@ -14,8 +14,10 @@ public:
 	static const uint32_t width = 10;
 	Board();
 	~Board();
+	//for these two, height's 0 index is the top, and height's <height> index is the bottom (apparently this is wrong
 	array<array<Cell, height>, width> cells;
-
+	array<bool, height> empty;
+	
 	// Tests if the piece will run into another piece (or the bottom)
 	bool TestCollision(Piece* piece) const;
 
@@ -24,6 +26,8 @@ public:
 	
 	// Filled in the board's cells for where the piece currently is
 	void SolidifyPiece(Piece* piece);
+
+	uint32_t tick();
 
 private:
 };
