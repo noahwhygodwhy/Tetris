@@ -49,6 +49,65 @@ uint32_t ResetWindowSize(HANDLE hStdout)
     return true;
 }
 
+static unordered_map<uint32_t, bool> keyDownMap;
+
+#define INPUT_ENTRY(key, actionWhenDown) \
+if ((GetKeyState(key) & 0x8000) && !keyDownMap[key])\
+{\
+    actionWhenDown;\
+    keyDownMap[key] = true;\
+}\
+if ((!(GetKeyState(key) & 0x8000)) && keyDownMap[key])\
+{\
+    keyDownMap[key] = false;\
+}
+
+void TryMove(const Board& board, Piece* activePiece, Coord2D move)
+{
+    activePiece->location += move;
+    if (board.TestOverlap(activePiece))
+    {
+        activePiece->location -= move;
+    }
+}
+void TryRotate(const Board& board, Piece* activePiece, int rotation)
+{
+    int srcRotation = activePiece->rotation;
+    activePiece->rotation = (activePiece->rotation + rotation) % 4; // rotation is a value between 0 and 3
+    int dstRotation = activePiece->rotation;
+
+    uint32_t key = wallKickKey(srcRotation, dstRotation);
+    array<Coord2D, 5> possibleOffsets = activePiece->type == PieceType::I ? 
+                                        IWallKicks.at(wallKickKey(srcRotation, dstRotation)) :
+                                        GeneralWallKicks.at(wallKickKey(srcRotation, dstRotation)); 
+
+    Coord2D originalLocation = activePiece->location;
+    for (Coord2D offset : possibleOffsets)
+    {
+        activePiece->location = originalLocation + offset;
+        if (!board.TestOverlap(activePiece))
+        {
+            // new rotation is good at the kick offset
+            return;
+        }
+
+    }
+    // fails rotation, reset piece
+    activePiece->location = originalLocation;
+    activePiece->rotation = srcRotation;
+
+}
+
+void HandleInput(const Board& board, Piece* activePiece)
+{
+    INPUT_ENTRY('A', TryMove(board, activePiece, Coord2D(-1, 0)))
+    INPUT_ENTRY('D', TryMove(board, activePiece, Coord2D(1, 0)))
+    INPUT_ENTRY('S', TryMove(board, activePiece, Coord2D(0, 1)))
+    INPUT_ENTRY('Q', TryRotate(board, activePiece, -1))
+    INPUT_ENTRY('E', TryRotate(board, activePiece, 1))
+}
+
+
 HANDLE hStdout;
 int main()
 {
@@ -97,37 +156,17 @@ int main()
     GetConsoleCursorInfo(hStdout, &curInfo);
     curInfo.bVisible = FALSE;
     SetConsoleCursorInfo(hStdout, &curInfo);
-    //printf("got console screen buffer info\n");
-    //if (!ResetWindowSize(hStdout))
-    //{
-    //    printf("ResetWindowSize (%d)\n", GetLastError());
-    //    return 0;
-    //}
-    //printf("did ResetWindowSize\n");
-    //std::fflush(stdout);
-    //exit(0);
 
-    //for (uint32_t i = 0; i < 1000; i++)
-    //{
-    //    wprintf(L"%u: %c\n", i, char(i));
-    //}
-    //exit(0);
     Board board = Board();
     PieceBag pieceBag = PieceBag();
     Piece * activePiece = nullptr;
 
-    unordered_map<uint32_t, bool> keyDownMap;
     for (uint32_t i = 0; i < 0xFF; i++)
     {
         keyDownMap.insert(pair(i, false));
     }
 
     uint32_t score = 0;
-
-    //board.cells[5][5] = Cell::LIGHT_BLUE;
-    //board.cells[5][6] = Cell::RED;
-    //board.cells[0][0] = Cell::GREEN;
-    //board.cells[board.width - 1][board.height - 1] = Cell::YELLOW;
 
     auto next = steady_clock::now();
     auto prev = next - 200ms;
@@ -146,28 +185,8 @@ int main()
         {
             break;
         }
-
-
-
-        if ((GetKeyState('A')&0x8000) && !keyDownMap['A'])
-        {
-            activePiece->location += Coord2D(-1, 0);
-            keyDownMap['A'] = true;
-        }
-        if ((!(GetKeyState('A') & 0x8000)) && keyDownMap['A'])
-        {
-            keyDownMap['A'] = false;
-        }
-
-        if ((GetKeyState('D') & 0x8000) && !keyDownMap['D'])
-        {
-            activePiece->location += Coord2D(1, 0);
-            keyDownMap['D'] = true;
-        }
-        if ((!(GetKeyState('D') & 0x8000)) && keyDownMap['D'])
-        {
-            keyDownMap['D'] = false;
-        }
+        HandleInput(board, activePiece);
+        
 
 //GAME LOGIC
 
@@ -214,7 +233,7 @@ int main()
             PieceDescription pd = pieceDictionary[uint32_t(activePiece->type)];
             for (uint32_t i = 0; i < 4; i++)
             {
-                pieceLocs[i] = topLeftOfBoard + activePiece->location + pd.offsets[i];
+                pieceLocs[i] = topLeftOfBoard + activePiece->location + activePiece->GetRotatedOffset(i);
                 boundingBoxMax.maxWith(pieceLocs[i]);
                 boundingBoxMin.minWith(pieceLocs[i]);
             }

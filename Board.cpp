@@ -17,13 +17,12 @@ Board::Board()
 	}
 }
 //TODO: needs to handle rotation
-bool Board::TestCollision(Piece* piece)
+bool Board::TestCollision(Piece* piece) const
 {
-	PieceDescription pd = pieceDictionary[uint32_t(piece->type)];
 	for (uint32_t i = 0; i < 4; i++)
 	{
 		//TODO: needs to handle rotation
-		Coord2D pieceCoord = piece->location + pd.offsets[i];
+		Coord2D pieceCoord = piece->location + piece->GetRotatedOffset(i);
 		Coord2D testCoord = pieceCoord + Coord2D(0, 1);
 		if (testCoord.y >= Board::height)
 		{
@@ -38,13 +37,34 @@ bool Board::TestCollision(Piece* piece)
 }
 
 //TODO: needs to handle rotation
+bool Board::TestOverlap(Piece* piece) const
+{
+	for (uint32_t i = 0; i < 4; i++)
+	{
+		//TODO: needs to handle rotation
+		Coord2D pieceCoord = piece->location + piece->GetRotatedOffset(i);
+		//test bottom
+		if (pieceCoord.x >= Board::width || pieceCoord.x < 0 || pieceCoord.y >= Board::height)
+		{
+			return true;
+		}
+		if (cells[pieceCoord.x][pieceCoord.y] != Cell::EMPTY)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+//TODO: needs to handle rotation
 void Board::SolidifyPiece(Piece* piece)
 {
 	PieceDescription pd = pieceDictionary[uint32_t(piece->type)];
 	for (uint32_t i = 0; i < 4; i++)
 	{
 		//TODO: needs to handle rotation
-		Coord2D pieceCoord = piece->location + pd.offsets[i];
+		Coord2D pieceCoord = piece->location + piece->GetRotatedOffset(i);
 		cells[pieceCoord.x][pieceCoord.y] = pd.color;
 	}
 }

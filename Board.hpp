@@ -16,7 +16,13 @@ public:
 	~Board();
 	array<array<Cell, height>, width> cells;
 
-	bool TestCollision(Piece* piece);
+	// Tests if the piece will run into another piece (or the bottom)
+	bool TestCollision(Piece* piece) const;
+
+	// Tests if the peice is already overlapping with another piece (or the walls)
+	bool TestOverlap(Piece* piece) const;
+	
+	// Filled in the board's cells for where the piece currently is
 	void SolidifyPiece(Piece* piece);
 
 private:
