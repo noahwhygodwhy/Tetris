@@ -108,6 +108,25 @@ void HandleInput(const Board& board, Piece* activePiece)
 }
 
 
+
+
+void Lose(HANDLE hStdout)
+{
+    SetConsoleTextAttribute(hStdout, 12);
+    wprintf(L"\033[%d;%dH", (5), (Board::width + 4));
+    wprintf(L"┌─────────────┐\n");
+    wprintf(L"\033[%d;%dH", (6), (Board::width + 4));
+    wprintf(L"│ You Lose :( │\n");
+    wprintf(L"\033[%d;%dH", (7), (Board::width + 4));
+    wprintf(L"└─────────────┘\n");
+    wprintf(L"\033[%d;%dH", (Board::height + 3), (0));
+    SetConsoleTextAttribute(hStdout, 15);
+    system("pause");
+    exit(0);
+}
+
+
+
 HANDLE hStdout;
 int main()
 {
@@ -181,7 +200,7 @@ int main()
             activePiece = new Piece(pieceBag.next());
             if (board.TestOverlap(activePiece))
             {
-                Lose();
+                Lose(hStdout);
             }
             //pieceBag.next(activePiece));
         }
@@ -216,6 +235,8 @@ int main()
                 //wprintf(L"activePieceLoc: %u, %u\n", activePiece->location.x, activePiece->location.y);
             }
             uint32_t linesEliminated = board.tick();
+            uint32_t lineScore = 100u * pow(2u, linesEliminated - 1);
+            score += lineScore;
         }
         
 //DRAW STATE
@@ -291,6 +312,11 @@ int main()
         }
         wprintf(L"╝");
         wprintf(L"\n");
+
+
+        wprintf(L"\033[%d;%dH", (3), (Board::width + 4));
+        wprintf(L"Score: %u\n", score);
+
 #endif // DEBUG_PRINT
         next += 200ms;
 
