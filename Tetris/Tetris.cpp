@@ -175,6 +175,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 
+    //these in pixels
     const uint32_t blockSize = 45;
     const uint32_t blockpadding = 5;
     const uint32_t boardBorder = 10;
@@ -189,6 +190,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     const uint32_t defaultWidth = boardBackgroundWidth;
     const uint32_t defaultHeight = boardBackgroundHeight;
+
     WNDCLASSEX classDescriptor = {
         .cbSize = sizeof(WNDCLASSEX),
         .style = CS_HREDRAW | CS_VREDRAW,
@@ -211,32 +213,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     D2DContext* ctx = new D2DContext(hwnd);
 
     ID2D1SolidColorBrush* whiteBrush = nullptr;
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whiteBrush);
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whiteBrush));
 
     //The order of these matter, they line up with the Ordered enum PieceType
     array<ID2D1SolidColorBrush*, PieceType::COUNT> pieceBrushes;
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Cyan),    &pieceBrushes[PieceType::I]);
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow),  &pieceBrushes[PieceType::O]);
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Magenta), &pieceBrushes[PieceType::T]);
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Green),   &pieceBrushes[PieceType::S]);
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red),     &pieceBrushes[PieceType::Z]);
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue),    &pieceBrushes[PieceType::J]);
-    ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Orange),  &pieceBrushes[PieceType::L]);
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Cyan),    &pieceBrushes[PieceType::I]));
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow),  &pieceBrushes[PieceType::O]));
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Magenta), &pieceBrushes[PieceType::T]));
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Green),   &pieceBrushes[PieceType::S]));
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red),     &pieceBrushes[PieceType::Z]));
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue),    &pieceBrushes[PieceType::J]));
+    TIF(ctx->d2d_renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Orange),  &pieceBrushes[PieceType::L]));
 
-
-    //these in pixels
-
-
-    //D2D1_RECT_F f = D2D1::RectF(5, 5, 500, 500);
-
-    //ctx->d2d_renderTarget->FillRectangle(
-    //    f,
-    //    /*D2D1::RectF(
-    //        ctx->rc->left + 100.0f,
-    //        ctx->rc->top + 100.0f,
-    //        ctx->rc->right - 100.0f,
-    //        ctx->rc->bottom - 100.0f),*/
-    //    pBlackBrush);
     GameState gz = {
         .board = Board(),
         .pieceBag = PieceBag(),
@@ -297,13 +285,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         }
         { // Draw section
 
-
             ctx->d2d_renderTarget->BeginDraw();
             ctx->d2d_renderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
             D2D1_RECT_F background = D2D1_RECT_F(0 + boardPositionX, 0 + boardPositionY, boardBackgroundWidth + boardPositionX, boardBackgroundHeight + boardPositionY);
             ctx->d2d_renderTarget->FillRectangle(background, whiteBrush);
 
+            for (uint32_t x = 0; x < numBlocksX; x++)
+            {
+                for (uint32_t y = 0; y < numBlocksY; y++)
+                {
+                    uint32_t cellx = boardPositionX + (x * blockSize) + ((x - 1) * blockpadding);
+                    uint32_t celly = boardPositionY + (y * blockSize) + ((y - 1) * blockpadding);
+                    D2D1_RECT_F cellRect = D2D1_RECT_F(cellx, celly, cellx+blockSize, celly+blockSize);
+                    ctx->d2d_renderTarget->FillRectangle(cellRect, pieceBrushes[uint32_t(gz.board.cells[x][y])]);
+                }
+            }
 
             TIF(ctx->d2d_renderTarget->EndDraw());
         }
@@ -314,7 +311,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 }
 
-
+//this is an old version, this main() doesn't get used anymore
 HANDLE hStdout;
 int main()
 {

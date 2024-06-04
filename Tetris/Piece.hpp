@@ -101,18 +101,20 @@ static const unordered_map<uint32_t, array<Coord2D, 5>> IWallKicks =
     { wallKickKey(3, 0), {Coord2D(0, 0), Coord2D(1, 0), Coord2D(-2, 0), Coord2D(1, 2), Coord2D(-2, -1) }},
     { wallKickKey(0, 3), {Coord2D(0, 0), Coord2D(-1, 0), Coord2D(2, 0), Coord2D(-1, -2), Coord2D(2, 1) }},
 };
+// Cell and PieceType line up
 
+// These are ordered
+// do not change the order
 enum class Cell : uint32_t
 {
-    EMPTY = 0,
-    LIGHT_BLUE = 11,
-    DARK_BLUE = 9,
-    ORANGE = 6,
-    YELLOW = 14,
-    GREEN = 10,
-    RED = 12,
-    MAGENTA = 13,
-    COUNT = 8,
+    CYAN,
+    YELLOW,
+    MAGENTA,
+    GREEN,
+    RED,
+    BLUE,
+    ORANGE,
+    COUNT
 };
 
 // These are ordered
@@ -140,12 +142,12 @@ struct PieceDescription
 
 //All of this is based on SRS, idk how ARS works
 static array<PieceDescription, PieceType::COUNT> pieceDictionary = {
-/*I*/ PieceDescription{4, {Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1), Coord2D(3, 1)}, Cell::LIGHT_BLUE},
+/*I*/ PieceDescription{4, {Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1), Coord2D(3, 1)}, Cell::CYAN},
 /*O*/ PieceDescription{2, {Coord2D(0, 0), Coord2D(0, 1), Coord2D(1, 0), Coord2D(1, 1)}, Cell::YELLOW},
 /*T*/ PieceDescription{3, {Coord2D(1, 0), Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1)}, Cell::MAGENTA},
 /*S*/ PieceDescription{3, {Coord2D(1, 0), Coord2D(2, 0), Coord2D(0, 1), Coord2D(1, 1)}, Cell::GREEN},
 /*Z*/ PieceDescription{3, {Coord2D(0, 0), Coord2D(1, 0), Coord2D(1, 1), Coord2D(2, 1)}, Cell::RED},
-/*J*/ PieceDescription{3, {Coord2D(0, 0), Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1)}, Cell::DARK_BLUE},
+/*J*/ PieceDescription{3, {Coord2D(0, 0), Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1)}, Cell::BLUE},
 /*L*/ PieceDescription{3, {Coord2D(2, 0), Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1)}, Cell::ORANGE},
 };
 
