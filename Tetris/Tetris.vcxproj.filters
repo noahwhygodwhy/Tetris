@@ -24,6 +24,9 @@
     <ClCompile Include="Piece.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D2DContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.hpp">
@@ -32,5 +35,11 @@
     <ClInclude Include="Piece.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D2DContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

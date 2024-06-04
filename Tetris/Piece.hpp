@@ -117,7 +117,7 @@ enum class Cell : uint32_t
 
 // These are ordered
 // do not change the order
-enum class PieceType : uint32_t
+enum PieceType : uint32_t
 {
     I,
     O,
@@ -139,7 +139,7 @@ struct PieceDescription
 
 
 //All of this is based on SRS, idk how ARS works
-static array<PieceDescription, uint32_t(PieceType::COUNT)> pieceDictionary = {
+static array<PieceDescription, PieceType::COUNT> pieceDictionary = {
 /*I*/ PieceDescription{4, {Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1), Coord2D(3, 1)}, Cell::LIGHT_BLUE},
 /*O*/ PieceDescription{2, {Coord2D(0, 0), Coord2D(0, 1), Coord2D(1, 0), Coord2D(1, 1)}, Cell::YELLOW},
 /*T*/ PieceDescription{3, {Coord2D(1, 0), Coord2D(0, 1), Coord2D(1, 1), Coord2D(2, 1)}, Cell::MAGENTA},
@@ -164,15 +164,15 @@ public:
 
 struct PieceBag
 {
-    array<PieceType, uint32_t(PieceType::COUNT)> queue = array<PieceType, uint32_t(PieceType::COUNT)>();
-    uint32_t currIndex = uint32_t(PieceType::COUNT);
+    array<PieceType, PieceType::COUNT> queue = array<PieceType, PieceType::COUNT>();
+    uint32_t currIndex = PieceType::COUNT;
 
     std::random_device rd;
     std::mt19937 g = mt19937(rd());
 
     void shuffleIt()
     {
-        for (uint32_t i = 0; i < uint32_t(PieceType::COUNT); i++)
+        for (uint32_t i = 0; i < PieceType::COUNT; i++)
         {
             queue[i] = PieceType(i);
         }
@@ -180,7 +180,7 @@ struct PieceBag
     }
     PieceType next()
     {
-        if (currIndex >= uint32_t(PieceType::COUNT))
+        if (currIndex >= PieceType::COUNT)
         {
             currIndex = 0;
             this->shuffleIt();
