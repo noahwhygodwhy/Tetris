@@ -105,7 +105,7 @@ static const unordered_map<uint32_t, array<Coord2D, 5>> IWallKicks =
 
 // These are ordered
 // do not change the order
-enum class Cell : uint32_t
+enum Cell : uint32_t
 {
     CYAN,
     YELLOW,
@@ -114,7 +114,7 @@ enum class Cell : uint32_t
     RED,
     BLUE,
     ORANGE,
-    COUNT
+    EMPTY
 };
 
 // These are ordered
