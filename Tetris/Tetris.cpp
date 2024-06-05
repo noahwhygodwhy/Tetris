@@ -146,7 +146,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         INPUT_ENTRY_DOWN('Q', TryRotate(gz->board, gz->activePiece, -1))
         INPUT_ENTRY_DOWN('E', TryRotate(gz->board, gz->activePiece, 1))
         INPUT_ENTRY_DOWN('F', extraSize++)
-        if (lParam == VK_ESCAPE)
+        if (wParam == VK_ESCAPE)
         {
             exit(0);
         }
